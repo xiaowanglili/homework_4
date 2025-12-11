@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.adplatform</groupId>
-    <artifactId>SecondHand</artifactId>
+    <artifactId>Homework_4_new</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>SecondHand</name>
     <packaging>war</packaging>
