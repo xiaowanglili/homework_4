@@ -1,42 +1,76 @@
-window.onload = function () {
-    loadMessages();
-    setInterval(loadMessages, 1000);
+let privateTarget = null;
 
-    document.getElementById("sendBtn").onclick = sendMessage;
+// 切换到私聊模式
+function startPrivateChat(username) {
+    privateTarget = username;
+    const mode = document.getElementById("chatMode");
+    const exitBtn = document.getElementById("exitPrivateBtn");
 
-    document.getElementById("inputMsg").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-};
-
-/* 加载消息 */
-function loadMessages() {
-    fetch(ROOT + "/chat")
-        .then(resp => resp.text())
-        .then(html => {
-            document.getElementById("chat-box").innerHTML = html;
-            let box = document.getElementById("chat-box");
-            box.scrollTop = box.scrollHeight; // 自动滚动到底部
-        });
+    if (mode) mode.innerText = "私聊对象：" + username;
+    if (exitBtn) exitBtn.style.display = "inline-block";
 }
 
-/* 发送消息 */
+// 退出私聊
+function exitPrivateChat() {
+    privateTarget = null;
+    const mode = document.getElementById("chatMode");
+    const exitBtn = document.getElementById("exitPrivateBtn");
+
+    if (mode) mode.innerText = "公共聊天";
+    if (exitBtn) exitBtn.style.display = "none";
+}
+
+// 拉取消息
+function loadMessages() {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", CTX + "/chat");
+
+    xhr.onload = function () {
+        if (xhr.status === 401) {
+            window.location.href = CTX + "/jsp/login.jsp";
+            return;
+        }
+
+        const tmp = document.createElement("div");
+        tmp.innerHTML = xhr.responseText;
+
+        document.getElementById("messages").innerHTML =
+            tmp.querySelector("#message-area").innerHTML;
+
+        document.getElementById("userList").innerHTML =
+            tmp.querySelector("#user-list-area").innerHTML;
+    };
+
+    xhr.send();
+}
+
+window.addEventListener("load", () => {
+    loadMessages();
+    setInterval(loadMessages, 1000);
+});
+
+// 发送消息
 function sendMessage() {
-    let content = document.getElementById("inputMsg").value.trim();
-    if (content === "") {
-        alert("请输入消息内容");
-        return;
+    const input = document.getElementById("inputBox");
+    const content = input.value.trim();
+    if (!content) return;
+
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", CTX + "/chat");
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+
+    let params = "content=" + encodeURIComponent(content);
+    if (privateTarget) {
+        params += "&toUser=" + encodeURIComponent(privateTarget);
     }
 
-    fetch(ROOT + "/chat", {
-        method: "POST",
-        headers: {"Content-Type": "application/x-www-form-urlencoded"},
-        body: "content=" + encodeURIComponent(content)
-    }).then(() => {
-        document.getElementById("inputMsg").value = "";
-        loadMessages();
-    });
+    xhr.onload = function () {
+        if (xhr.status === 401) {
+            window.location.href = CTX + "/jsp/login.jsp";
+            return;
+        }
+        input.value = "";
+    };
+
+    xhr.send(params);
 }

@@ -1,37 +1,43 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html>
+<%@ page contentType="text/html;charset=UTF-8" %>
+
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>注册</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <title>用户注册</title>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
-<body class="login-body">
-<div class="register-box">
-    <h2>用户注册</h2>
 
-    <c:if test="${not empty error}">
-        <div class="error">${error}</div>
-    </c:if>
+<body>
 
-    <form action="${pageContext.request.contextPath}/register" method="post">
-        <div class="form-group">
-            <label for="reg-username">用户名：</label>
-            <input type="text" id="reg-username" name="username" required>
+<div class="login-container">
+
+    <div class="login-title">用户注册</div>
+
+    <form action="../register" method="post" class="login-form">
+
+        <label>用户名：</label>
+        <input type="text" name="username" required>
+
+        <label>密码：</label>
+        <input type="password" name="password" required>
+
+        <label>确认密码：</label>
+        <input type="password" name="confirmPassword" required>
+
+        <label>验证码：</label>
+        <div class="captcha-box">
+            <input type="text" name="captcha" required>
+            <img src="../captcha" onclick="this.src='../captcha?' + Math.random()">
         </div>
 
-        <div class="form-group">
-            <label for="reg-password">密码：</label>
-            <input type="password" id="reg-password" name="password" required>
+        <button type="submit" class="login-btn">注册</button>
+
+        <div class="to-register">
+            已有账号？ <a href="login.jsp">立即登录</a>
         </div>
 
-        <button type="submit" class="register-button">注册</button>
     </form>
 
-    <p style="text-align:center; margin-top:20px;">
-        已有账号？<a href="${pageContext.request.contextPath}/jsp/login.jsp">立即登录</a>
-    </p>
 </div>
+
 </body>
 </html>
